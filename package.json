@@ -1,0 +1,43 @@
+{
+  "name": "@elearn/dashboard-app",
+  "version": "1.0.0",
+  "description": "Project EDEN: Dashboard application for administrative",
+  "main": "src/api/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duongtdn/dashboard-app.git"
+  },
+  "author": "duongtdn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/duongtdn/dashboard-app/issues"
+  },
+  "homepage": "https://github.com/duongtdn/dashboard-app#readme",
+  "dependencies": {
+    "@realmjs/account-client": "^1.2.0",
+    "@realmjs/react-user": "^1.0.1",
+    "@realmjs/xhttp-request": "^1.3.1",
+    "express-api-builder": "^1.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+    "@babel/preset-env": "^7.8.7",
+    "@babel/preset-react": "^7.8.3",
+    "@realmjs/dynamodb-helper": "^1.6.1",
+    "babel-loader": "^8.0.6",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "proxy-agent": "^3.1.1",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3",
+    "workbox-webpack-plugin": "^5.0.0"
+  }
+}
