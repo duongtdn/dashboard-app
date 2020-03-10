@@ -4,7 +4,12 @@
   "description": "Project EDEN: Dashboard application for administrative",
   "main": "src/api/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -rf build",
+    "copy": "cp src/client/index.html build/ && cp src/client/script/sw.js build/",
+    "build": "npm run clean && webpack --config webpack.build.config.js && npm run copy",
+    "server": "nodemon example/server",
+    "client": "npm run copy && webpack-dev-server --config webpack.dev.config.js  --port 3200",
+    "start": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -30,10 +35,12 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
     "@babel/preset-env": "^7.8.7",
     "@babel/preset-react": "^7.8.3",
-    "@realmjs/dynamodb-helper": "^1.6.1",
+    "@realmjs/dynamodb-helper": "^1.7.0",
     "babel-loader": "^8.0.6",
+    "concurrently": "^5.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "nodemon": "^2.0.2",
     "proxy-agent": "^3.1.1",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",
