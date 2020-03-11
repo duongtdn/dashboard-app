@@ -47,6 +47,7 @@ class Navigator extends Component {
     this.route = {
       navigate: this.navigate.bind(this)
     };
+    props.routeHandler && props.routeHandler(this.route);
 
     this.__registeredRoutes = {...props.routes};
 
