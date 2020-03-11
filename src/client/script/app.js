@@ -5,6 +5,15 @@ import { render } from 'react-dom'
 
 import App from "../Template/App"
 
+const env = {
+  assets: {
+    logo: {
+      png_trans: '',
+      png_bg: '',
+      icon: 'assets/icon.png'
+    }
+  }
+}
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -16,4 +25,4 @@ if ('serviceWorker' in navigator) {
 }
 
 
-render( <App/>, document.getElementById('root'))
+render( <App env = {env} />, document.getElementById('root'))

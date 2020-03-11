@@ -5,7 +5,7 @@
   "main": "src/api/main.js",
   "scripts": {
     "clean": "rm -rf build",
-    "copy": "cp src/client/index.html build/ && cp src/client/script/sw.js build/",
+    "copy": "cp src/client/index.html build/ && cp src/client/script/sw.js build/ && cp -r assets build/assets",
     "build": "npm run clean && webpack --config webpack.build.config.js && npm run copy",
     "server": "nodemon example/server",
     "client": "npm run copy && webpack-dev-server --config webpack.dev.config.js  --port 3200",
