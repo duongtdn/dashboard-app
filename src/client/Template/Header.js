@@ -88,7 +88,7 @@ export default class Header extends Component {
     return (
       <header style={{margin: 0}}>
         <div className="w3-bar ">
-          <a className="w3-bar-item w3-button w3-hover-none" style={{padding: '8px 0'}}> <Logo {...this.props} /> </a>
+          <a className="w3-bar-item w3-button w3-hover-none" > <Logo {...this.props} /> </a>
           <div className="w3-bar-item w3-right" style={{padding: '10px'}}>
           {
             this.props.user?

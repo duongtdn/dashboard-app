@@ -13,7 +13,7 @@ export default class Report extends Component {
     const route = this.props.route
     const page = this.props.page
     return (
-      <div>
+      <div className="w3-container">
         <h3> Report </h3>
         <br/>
         <button className="w3-button w3-blue" onClick = {e => route.navigate('order')}> Order </button>
