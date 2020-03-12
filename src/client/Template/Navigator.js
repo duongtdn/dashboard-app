@@ -24,6 +24,28 @@ class Page extends Component {
   }
 }
 
+class Popup extends Component {
+  constructor(props) {
+    super(props);
+    this.closePopup = this.closePopup.bind(this);
+  }
+  render() {
+
+    return (
+      <div className="w3-modal" style={{display: this.props.show? 'block' : 'none'}} onClick={ this.closePopup }>
+        <div className="w3-model-content">
+          {this.props.children}
+        </div>
+      </div>
+    )
+  }
+  closePopup() {
+    if (this.props.options && this.props.options.clickOutsideToClose) {
+      this.props.popup.hide();
+    }
+  }
+}
+
 /**
  * Navigator component
  * @extends Component
@@ -41,7 +63,8 @@ class Navigator extends Component {
 
     this.state = {
       routeStack : props.initialRouteStack || [props.initialRoute] || [],
-      activeRoute: props.initialRoute || null
+      activeRoute: props.initialRoute || null,
+      showPopup: false,
     };
 
     this.route = {
@@ -58,8 +81,12 @@ class Navigator extends Component {
       this.__supportedPageEvents.forEach( e => this.__events[name][e] = [] );
     }
 
+    this.__popupStack = {};
+
     this.__createInjectPage = this.__createInjectPage.bind(this);
     this.__fire = this.__fire.bind(this);
+    this.__showPopup = this.__showPopup.bind(this);
+    this.__hidePopup = this.__hidePopup.bind(this);
 
   }
 
@@ -78,9 +105,16 @@ class Navigator extends Component {
                   { React.createElement(route.Page, { route: this.route, page, ...this.props }) }
                 </Page>
                 {/* Popup */}
-                <div>
-
-                </div>
+                <Popup  show = {this.state.showPopup}
+                        options = {this.__popupStack[name] && this.__popupStack[name].options}
+                        popup = {page.popup}
+                >
+                  {
+                    this.__popupStack[name] && this.__popupStack[name].Popup ?
+                      React.cloneElement(this.__popupStack[name].Popup, { hide: page.popup.hide })
+                      : null
+                  }
+                </Popup>
               </div>
             )
           })
@@ -96,7 +130,10 @@ class Navigator extends Component {
           this.__events[name][event].push(handler);
         }
       },
-      popup: {},
+      popup: {
+        show: (popup, options) => this.__showPopup(name, popup, options),
+        hide: (options) => this.__hidePopup(name, options)
+      },
     }
     this.__supportedPageEvents.forEach( e => page[`on${capitalize(e)}`] = handler => page.on(e, handler) )
     return page;
@@ -123,6 +160,16 @@ class Navigator extends Component {
     }
     this.__fire(this.state.activeRoute, 'leave');
     this.setState({ routeStack, activeRoute })
+  }
+
+  __showPopup(name, popup, options) {
+    this.__popupStack[name] = {Popup: popup, options };
+    this.setState({ showPopup: true });
+  }
+
+  __hidePopup(name, options) {
+    this.__popupStack[name] = undefined;
+    this.setState({ showPopup: false });
   }
 
 }
