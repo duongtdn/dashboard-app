@@ -110,7 +110,7 @@ class Navigator extends Component {
                     this.__popupStack[name] && this.__popupStack[name].map( (popup, index) => {
                       const last = this.__popupStack[name].length - 1;
                       return (
-                        <div key={index} className="w3-model-content" style={{pointerEvents: index === last? 'all' : 'all'}}>
+                        <div key={index} className="w3-model-content">
                           { React.createElement(popup.Popup, { self: popup.self }) }
                         </div>
                       )
