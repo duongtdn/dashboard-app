@@ -33,9 +33,7 @@ class Popup extends Component {
 
     return (
       <div className="w3-modal" style={{display: this.props.show? 'block' : 'none'}} onClick={ this.closePopup }>
-        <div className="w3-model-content">
-          {this.props.children}
-        </div>
+        {this.props.children}
       </div>
     )
   }
@@ -85,8 +83,7 @@ class Navigator extends Component {
 
     this.__createInjectPage = this.__createInjectPage.bind(this);
     this.__fire = this.__fire.bind(this);
-    this.__showPopup = this.__showPopup.bind(this);
-    this.__hidePopup = this.__hidePopup.bind(this);
+    this.__createPopup = this.__createPopup.bind(this);
 
   }
 
@@ -110,9 +107,14 @@ class Navigator extends Component {
                         popup = {page.popup}
                 >
                   {
-                    this.__popupStack[name] && this.__popupStack[name].Popup ?
-                      React.cloneElement(this.__popupStack[name].Popup, { hide: page.popup.hide })
-                      : null
+                    this.__popupStack[name] && this.__popupStack[name].map( (popup, index) => {
+                      const last = this.__popupStack[name].length - 1;
+                      return (
+                        <div key={index} className="w3-model-content" style={{pointerEvents: index === last? 'all' : 'all'}}>
+                          { React.createElement(popup.Popup, { self: popup.self }) }
+                        </div>
+                      )
+                    })
                   }
                 </Popup>
               </div>
@@ -131,8 +133,9 @@ class Navigator extends Component {
         }
       },
       popup: {
-        show: (popup, options) => this.__showPopup(name, popup, options),
-        hide: (options) => this.__hidePopup(name, options)
+        new: (popup, options, cb) => this.__createPopup(name, popup, options, cb),
+        resolve: (data) => this.__popupResolve(name, data),
+        reject: (error) => this.__popupReject(name, error)
       },
     }
     this.__supportedPageEvents.forEach( e => page[`on${capitalize(e)}`] = handler => page.on(e, handler) )
@@ -162,14 +165,43 @@ class Navigator extends Component {
     this.setState({ routeStack, activeRoute })
   }
 
-  __showPopup(name, popup, options) {
-    this.__popupStack[name] = {Popup: popup, options };
-    this.setState({ showPopup: true });
+  __createPopup(name, popup, options, cb) {
+    return new Promise((resolve, reject) => {
+      let self = {};
+      if (Object.prototype.toString.call(options) == '[object Function]') {
+        cb = options;
+      } else {
+        self = { ...options };
+      }
+      self.resolve = (data) => this.__popupResolve(name, data, self);
+      self.reject = (error) => this.__popupReject(name, error, self);
+      if (!this.__popupStack[name]) {
+        this.__popupStack[name] = [];
+      }
+      this.__popupStack[name].push({ Popup: popup, self, resolve, reject });
+      this.setState({ showPopup: true });
+      cb && cb(self);
+    })
   }
 
-  __hidePopup(name, options) {
-    this.__popupStack[name] = undefined;
-    this.setState({ showPopup: false });
+  __popupResolve(name, data, self) {
+    if (this.__popupStack[name] && this.__popupStack[name].length > 0) {
+      const index =  this.__popupStack[name].findIndex( p => p.self === self);
+      if (index === -1) { return; }
+      const { resolve } = this.__popupStack[name].splice(index, 1)[0];
+      this.__popupStack[name].length == 0 ? this.setState({ showPopup: false }): this.setState({ showPopup: true });
+      resolve && resolve(data);
+    }
+  }
+
+  __popupReject(name, error, self) {
+    if (this.__popupStack[name] && this.__popupStack[name].length > 0) {
+      const index =  this.__popupStack[name].findIndex( p => p.self === self);
+      if (index === -1) { return; }
+      const { reject } = this.__popupStack[name].splice(index, 1)[0];
+      this.__popupStack[name].length == 0 ? this.setState({ showPopup: false }): this.setState({ showPopup: true });
+      reject && reject(error);
+    }
   }
 
 }
