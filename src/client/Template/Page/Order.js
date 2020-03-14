@@ -45,9 +45,9 @@ export default class Order extends Component {
     this.state = {
       popupMessage: '',
     };
-    // props.page.onLoad(e => console.log('Load Order'));
-    // props.page.onEnter(e => console.log('Enter Order'));
-    // props.page.onLeave(e => console.log('Leave Order'));
+    props.page.onLoad(e => console.log('Load Order'));
+    props.page.onEnter(e => console.log('Enter Order'));
+    props.page.onLeave(e => console.log('Leave Order'));
   }
   render() {
     const route = this.props.route

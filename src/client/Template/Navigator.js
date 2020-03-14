@@ -176,7 +176,7 @@ class Navigator extends Component {
       }
       this.__popupStack[name].push({ Popup: popup, self, resolve, reject });
       this.setState({ showPopup: true });
-      cb && cb(self);
+      cb && cb({ resolve: self.resolve, reject: self.reject });
     })
   }
 
