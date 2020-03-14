@@ -27,20 +27,13 @@ class Page extends Component {
 class Popup extends Component {
   constructor(props) {
     super(props);
-    this.closePopup = this.closePopup.bind(this);
   }
   render() {
-
     return (
-      <div className="w3-modal" style={{display: this.props.show? 'block' : 'none'}} onClick={ this.closePopup }>
+      <div className="w3-modal" style={{display: this.props.show? 'block' : 'none'}}>
         {this.props.children}
       </div>
     )
-  }
-  closePopup() {
-    if (this.props.options && this.props.options.clickOutsideToClose) {
-      this.props.popup.hide();
-    }
   }
 }
 
