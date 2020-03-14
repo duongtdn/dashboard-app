@@ -132,13 +132,9 @@ class Navigator extends Component {
           this.__events[name][event].push(handler);
         }
       },
-      popup: {
-        new: (popup, options, cb) => this.__createPopup(name, popup, options, cb),
-        resolve: (data) => this.__popupResolve(name, data),
-        reject: (error) => this.__popupReject(name, error)
-      },
+      popup: (popup, options, cb) => this.__createPopup(name, popup, options, cb),
     }
-    this.__supportedPageEvents.forEach( e => page[`on${capitalize(e)}`] = handler => page.on(e, handler) )
+    this.__supportedPageEvents.forEach( e => page[`on${capitalize(e)}`] = handler => page.on(e, handler) );
     return page;
   }
 

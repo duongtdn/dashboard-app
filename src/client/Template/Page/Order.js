@@ -68,22 +68,21 @@ export default class Order extends Component {
     );
   }
   showPopup() {
-    let p = null;
-    this.props.page.popup.new(Popup, self => setTimeout(() =>self.reject('rejected by Timeout'), 3000))
+    this.props.page.popup(Popup, self => setTimeout(() =>self.reject('rejected by Timeout'), 3000))
     .then( (m) => {
       console.log(m);
-      return this.props.page.popup.new(Diag);
+      return this.props.page.popup(Diag);
     })
     .then( m => console.log(m) )
     .catch( e => console.log(e) );
   }
 
   showManyPopups() {
-    this.props.page.popup.new(Popup)
+    this.props.page.popup(Popup)
     .then( m => console.log(m) )
     .catch( e => console.log(e) );
 
-    this.props.page.popup.new(Diag)
+    this.props.page.popup(Diag)
     .then( m => console.log(m) )
     .catch( e => console.log(e) );
   }
