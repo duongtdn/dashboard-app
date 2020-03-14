@@ -6,6 +6,7 @@ export default class Report extends Component {
   constructor(props) {
     super(props);
     props.page.onLoad(e => console.log('Load Report'));
+    props.page.onBeforeEnter(e => alert('Before Enter Report'));
     props.page.onEnter(e => console.log('Enter Report'));
     props.page.onLeave(e => console.log('Leave Report'));
   }

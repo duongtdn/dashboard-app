@@ -14,8 +14,8 @@ class Page extends Component {
       this.props.fire('enter')
     }
   }
-  componentDidUpdate() {
-    if (this.props.active) {
+  componentDidUpdate(prevProps) {
+    if (this.props.active && !prevProps.active) {
       this.props.fire('enter')
     }
   }
@@ -65,7 +65,7 @@ class Navigator extends Component {
 
     this.__registeredRoutes = {...props.routes};
 
-    this.__supportedPageEvents = ['load', 'beforeEnter', 'enter', 'beforeLeave', 'leave'];
+    this.__supportedPageEvents = ['load', 'beforeEnter', 'enter', 'leave'];
     this.__events = {};
     for (let name in this.__registeredRoutes) {
       this.__events[name] = {};
@@ -151,6 +151,7 @@ class Navigator extends Component {
       routeStack.push(name);
     }
     this.__fire(this.state.activeRoute, 'leave');
+    this.__fire(activeRoute, 'beforeEnter');
     this.setState({ routeStack, activeRoute })
   }
 
