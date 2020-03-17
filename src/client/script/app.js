@@ -3,7 +3,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import App from "../Template/App"
+import AppData from "../Template/AppData"
 
 const env = {
   assets: {
@@ -25,4 +25,4 @@ if ('serviceWorker' in navigator) {
 }
 
 
-render( <App env = {env} />, document.getElementById('root'))
+render( <AppData env = {env} />, document.getElementById('root'))

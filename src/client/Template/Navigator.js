@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react'
 
-import { capitalize } from './lib/util'
+import { capitalize } from '../lib/util'
 
 class Page extends Component {
   constructor(props) {

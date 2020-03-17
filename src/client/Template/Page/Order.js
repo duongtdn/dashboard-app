@@ -14,9 +14,19 @@ export default class Order extends Component {
   render() {
     const route = this.props.route
     const page = this.props.page
+    console.log(this.props.order)
     return (
       <div className="w3-container">
         <h3> Order </h3>
+        <ul>
+        {
+          this.props.order.map(order => {
+            return (
+            <li key={order.number} > {order.number.split('-')[0]} </li>
+            )
+          })
+        }
+        </ul>
       </div>
     );
   }
