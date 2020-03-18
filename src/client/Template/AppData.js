@@ -136,22 +136,20 @@ const db = new LocalDB({ stores: {
 
 dump.forEach(order => {
   db.order.put(order).then( () => console.log(`put order: ${order.number}`));
-})
-
-// db.order.get('436063-wwfif7v7t6m').then(data => console.log(data));
-// db.order.all().then( data => console.log(data) );
+});
 
 export default class AppData extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      order: []
+      orders: []
     };
-    db.order.all().then( order => this.setState({ order }) );
+    db.order.all().then( orders => this.setState({ orders }) );
   }
   render() {
     return (
-      <App  order = {this.state.order}
+      <App  orders = {this.state.orders}
+            db = {db}
             {...this.props}
       />
     );

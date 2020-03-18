@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react'
 
-import Logo from './Logo'
+import Logo from './Widget/Logo'
 
 class UserSnipet extends Component {
   constructor(props) {
