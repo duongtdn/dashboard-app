@@ -9,8 +9,8 @@ import Dropdown from '../Widget/Dropdown'
 const Item = (props) => (
   <div style={{marginBottom: '8px'}}>
     <label> {props.item.name} </label>
-    <br />
-    <label className = "w3-small w3-text-grey" > {props.item.code} </label>
+    {/* <br />
+    <label className = "w3-small w3-text-grey" > {props.item.code} </label> */}
   </div>
 );
 
@@ -39,7 +39,8 @@ class Row extends Component {
     };
     return (
       <tr key={order.number} >
-        <td> <a href='' onClick={this.showPopupOrder}> {order.number.split('-')[0]} </a> </td>
+        <td> <i className="fas fa-exclamation w3-small w3-text-red" /> </td>
+        <td> <a href='' onClick={this.showPopupOrder}> #{order.number.split('-')[0]} </a> </td>
         <td> {order.items.map( item => <Item key={item.code} item = {item} /> )} </td>
         <td> {localeString(subTotal, ',')} </td>
         <td> <label className={`w3-tag w3-${statusTagColor}`}>{order.status.toUpperCase()}</label> </td>
@@ -68,13 +69,14 @@ class Table extends Component {
         <h5 className="bold"> {this.months[this.props.month]} <label className="normal"> ({this.props.orders.length}) </label> </h5>
         <table className="w3-table w3-bordered">
           <thead>
-            <tr className="w3-small">
+            <tr className=" w3-text-blue">
+              <th></th>
               <th>Number</th>
               <th>Item</th>
-              <th>Sub Total</th>
-              <th>Status</th>
-              <th>Payment</th>
-              <th>Created At</th>
+              <th>Sub Total <i className="fas fa-sort  w3-text-grey cursor-pointer" /> </th>
+              <th>Status <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" /> </th>
+              <th>Payment <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" /></th>
+              <th>Created At <i className="fas fa-sort  w3-text-grey cursor-pointer" /> </th>
             </tr>
           </thead>
           <tbody>
