@@ -4,6 +4,7 @@ import React, { Component } from 'react'
 
 import { localeString, getDay, getTime } from '../../lib/util'
 import PopupOrder from '../Popup/Order'
+import PopupFilter from '../Popup/Filter'
 import Dropdown from '../Widget/Dropdown'
 
 const Item = (props) => (
@@ -63,11 +64,23 @@ class Table extends Component {
     super(props);
     this.state = {
       sort: { subTotal: false, createdAt: false },
+      filter: { status: false, payment: false },
     };
     this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    this.popupFilterStatus = this.popupFilterStatus.bind(this);
+    this.popupFilterPayment = this.popupFilterPayment.bind(this);
   }
   render() {
-    const orders = this.sort([...this.props.orders]);
+    const orders = this.sort([...this.props.orders]).filter(order => {
+      const filter = this.state.filter;
+      if (filter.status && filter.status.indexOf(order.status) === -1) {
+        return false;
+      }
+      if (filter.payment && filter.payment.indexOf(order.paymentMethod) === -1) {
+        return false;
+      }
+      return true;
+    });
     return (
       <div style = {{margin: '16px 0 48px 0'}} >
         <h5 className="bold"> {this.months[this.props.month]} <label className="normal"> ({this.props.orders.length}) </label> </h5>
@@ -84,21 +97,21 @@ class Table extends Component {
               <th>
                 Sub Total {' '}
                 <span className = "w3-text-grey cursor-pointer" style = {{ position: 'relative'}} onClick = {e => this.toggleSort('subTotal')}>
-                  <i className={`fas fa-sort-up ${this.state.sort.subTotal === 'ascending'? ' w3-text-orange' : ''}`}  />
-                  <i className={`fas fa-sort-down ${this.state.sort.subTotal === 'descending'? ' w3-text-orange' : ''}`} style = {{ position: 'absolute', left: 0, top: '2px'}} />
+                  <i className = {`fas fa-sort-up ${this.state.sort.subTotal === 'ascending'? ' w3-text-orange' : ''}`}  />
+                  <i className = {`fas fa-sort-down ${this.state.sort.subTotal === 'descending'? ' w3-text-orange' : ''}`} style = {{ position: 'absolute', left: 0, top: '2px'}} />
                 </span>
               </th>
               <th>
-                Status <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" />
+                Status <i className = {`fas fa-filter w3-small ${this.state.filter.status.length > 0? 'w3-text-orange': 'w3-text-grey'} cursor-pointer`} onClick = {this.popupFilterStatus} />
               </th>
               <th>
-                Payment <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" />
+                Payment <i className = {`fas fa-filter w3-small ${this.state.filter.payment.length > 0? 'w3-text-orange': 'w3-text-grey'} cursor-pointer`} onClick = {this.popupFilterPayment} />
               </th>
               <th>
                 Created At {' '}
                 <span className = "w3-text-grey cursor-pointer" style = {{ position: 'relative'}} onClick = {e => this.toggleSort('createdAt')}>
-                  <i className={`fas fa-sort-up ${this.state.sort.createdAt === 'ascending'? ' w3-text-orange' : ''}`}  />
-                  <i className={`fas fa-sort-down ${this.state.sort.createdAt === 'descending'? ' w3-text-orange' : ''}`} style = {{ position: 'absolute', left: 0, top: '2px'}} />
+                  <i className = {`fas fa-sort-up ${this.state.sort.createdAt === 'ascending'? ' w3-text-orange' : ''}`}  />
+                  <i className = {`fas fa-sort-down ${this.state.sort.createdAt === 'descending'? ' w3-text-orange' : ''}`} style = {{ position: 'absolute', left: 0, top: '2px'}} />
                 </span>
               </th>
             </tr>
@@ -143,6 +156,26 @@ class Table extends Component {
     }
     sort[attr] = direction;
     this.setState({ sort });
+  }
+  popupFilterStatus(e) {
+    e.preventDefault();
+    this.props.page.popup(PopupFilter, {filter: this.state.filter.status, options: ['new', 'delivery', 'fulfill', 'deleted']})
+    .then( status => {
+      const filter = {...this.state.filter};
+      filter.status = status;
+      this.setState({ filter });
+    })
+    .catch( () => {});
+  }
+  popupFilterPayment(e) {
+    e.preventDefault();
+    this.props.page.popup(PopupFilter, {filter: this.state.filter.payment, options: ['cod', 'bank', 'credit', 'momo']})
+    .then( payment => {
+      const filter = {...this.state.filter};
+      filter.payment = payment;
+      this.setState({ filter });
+    })
+    .catch( () => {});
   }
 }
 

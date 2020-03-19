@@ -92,8 +92,8 @@ const dump = [
       "1584429280105": "new order created"
     },
     "number": "492451-1uo5m91zi1e",
-    "paymentMethod": "cod",
-    "status": "new",
+    "paymentMethod": "bank",
+    "status": "fulfill",
     "uid": "220f71d0-2800-11ea-91a8-9f528720b885"
   },
   {
@@ -124,8 +124,8 @@ const dump = [
       "1584429302684": "new order created"
     },
     "number": "553689-3n0qtoxlgjg",
-    "paymentMethod": "cod",
-    "status": "new",
+    "paymentMethod": "credit",
+    "status": "fulfill",
     "uid": "220f71d0-2800-11ea-91a8-9f528720b885"
   }
 ]
