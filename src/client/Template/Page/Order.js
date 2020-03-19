@@ -61,9 +61,13 @@ class Row extends Component {
 class Table extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      sort: { subTotal: false, createdAt: false },
+    };
     this.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   }
   render() {
+    const orders = this.sort([...this.props.orders]);
     return (
       <div style = {{margin: '16px 0 48px 0'}} >
         <h5 className="bold"> {this.months[this.props.month]} <label className="normal"> ({this.props.orders.length}) </label> </h5>
@@ -71,17 +75,37 @@ class Table extends Component {
           <thead>
             <tr className=" w3-text-blue">
               <th></th>
-              <th>Number</th>
-              <th>Item</th>
-              <th>Sub Total <i className="fas fa-sort  w3-text-grey cursor-pointer" /> </th>
-              <th>Status <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" /> </th>
-              <th>Payment <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" /></th>
-              <th>Created At <i className="fas fa-sort  w3-text-grey cursor-pointer" /> </th>
+              <th>
+                Number
+              </th>
+              <th>
+                Item
+              </th>
+              <th>
+                Sub Total {' '}
+                <span className = "w3-text-grey cursor-pointer" style = {{ position: 'relative'}} onClick = {e => this.toggleSort('subTotal')}>
+                  <i className={`fas fa-sort-up ${this.state.sort.subTotal === 'ascending'? ' w3-text-orange' : ''}`}  />
+                  <i className={`fas fa-sort-down ${this.state.sort.subTotal === 'descending'? ' w3-text-orange' : ''}`} style = {{ position: 'absolute', left: 0, top: '2px'}} />
+                </span>
+              </th>
+              <th>
+                Status <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" />
+              </th>
+              <th>
+                Payment <i className="fas fa-filter w3-small w3-text-grey cursor-pointer" />
+              </th>
+              <th>
+                Created At {' '}
+                <span className = "w3-text-grey cursor-pointer" style = {{ position: 'relative'}} onClick = {e => this.toggleSort('createdAt')}>
+                  <i className={`fas fa-sort-up ${this.state.sort.createdAt === 'ascending'? ' w3-text-orange' : ''}`}  />
+                  <i className={`fas fa-sort-down ${this.state.sort.createdAt === 'descending'? ' w3-text-orange' : ''}`} style = {{ position: 'absolute', left: 0, top: '2px'}} />
+                </span>
+              </th>
             </tr>
           </thead>
           <tbody>
             {
-              this.props.orders.map(order => {
+             orders.map(order => {
                 return (
                   <Row key = {order.number} order = {order} {...this.props} />
                 )
@@ -91,6 +115,34 @@ class Table extends Component {
         </table>
       </div>
     )
+  }
+  sort(orders) {
+    const sort = this.state.sort;
+    if (!sort.subTotal && !sort.createdAt) {
+      return orders;
+    } else {
+      return orders.sort( (a, b) => {
+        if (sort.subTotal) {
+          const aTotal = a.items.reduce( (acc,cur) => acc + cur.price, 0);
+          const bTotal = b.items.reduce( (acc,cur) => acc + cur.price, 0);
+          return sort.subTotal === 'ascending'? aTotal - bTotal : bTotal - aTotal;
+        } else if (sort.createdAt) {
+          return sort.createdAt === 'ascending'? a.createdAt - b.createdAt : b.createdAt - a.createdAt;
+        } else {
+          console.error('no sort attribute')
+          return a - b;
+        }
+      });
+    }
+  }
+  toggleSort(attr) {
+    const direction = this.state.sort[attr] === 'ascending' ? 'descending' : 'ascending';
+    const sort = {...this.state.sort};
+    for (let key in sort) {
+      sort[key] = false;
+    }
+    sort[attr] = direction;
+    this.setState({ sort });
   }
 }
 
