@@ -31,6 +31,9 @@ class Row extends Component {
       case 'FULFILL':
         statusTagColor = 'green';
         break;
+      case 'DELIVERY':
+        statusTagColor = 'blue';
+        break;
       case 'DELETED':
         statusTagColor = 'grey';
         break;
@@ -53,9 +56,7 @@ class Row extends Component {
   showPopupOrder(e) {
     e.preventDefault();
     const order = this.props.order;
-    this.props.page.popup(PopupOrder, { order })
-    .then( m => console.log(m) )
-    .catch( e => console.log(e) );
+    this.props.popupOrder && this.props.popupOrder({ order });
   }
 }
 
@@ -169,7 +170,7 @@ class Table extends Component {
   }
   popupFilterPayment(e) {
     e.preventDefault();
-    this.props.page.popup(PopupFilter, {filter: this.state.filter.payment, options: ['cod', 'bank', 'credit', 'momo']})
+    this.props.page.popup(PopupFilter, {filter: this.state.filter.payment, options: ['cod', 'bank', 'card', 'momo']})
     .then( payment => {
       const filter = {...this.state.filter};
       filter.payment = payment;
@@ -251,6 +252,7 @@ export default class Order extends Component {
 
     this.onSelectYear = this.onSelectYear.bind(this);
     this.onSelectMonth = this.onSelectMonth.bind(this);
+    this.popupOrder = this.popupOrder.bind(this);
   }
   render() {
     const route = this.props.route
@@ -271,7 +273,7 @@ export default class Order extends Component {
               <div key={year.year}>
                 <h4 className = "bold" style = {{ marginTop: '16px' }}> {year.year} </h4>
                 {
-                  year.months.map(month => <Table key = {month} month = {month} {...this.props} />)
+                  year.months.map(month => <Table key = {month} month = {month} popupOrder = {this.popupOrder} {...this.props} />)
                 }
               </div>
             );
@@ -296,5 +298,10 @@ export default class Order extends Component {
     const year = this.state.years[0].year;
     const years = this.findYearsAndMonthsToShow(year, month);
     this.setState({ years });
+  }
+  popupOrder({ order }) {
+    this.props.page.popup(PopupOrder, { order })
+    .then( action => console.log(action) )
+    .catch(() => {});
   }
 }

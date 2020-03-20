@@ -124,7 +124,7 @@ const dump = [
       "1584429302684": "new order created"
     },
     "number": "553689-3n0qtoxlgjg",
-    "paymentMethod": "credit",
+    "paymentMethod": "card",
     "status": "fulfill",
     "uid": "220f71d0-2800-11ea-91a8-9f528720b885"
   }
