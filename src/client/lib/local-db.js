@@ -16,7 +16,15 @@ class Store {
     return (await this.db).getAll(this.name, query);
   }
   async put(data) {
-    return (await this.db).put(this.name, data);
+    const tx = (await this.db).transaction(this.name, 'readwrite');
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        tx.store.put(item);
+      });
+    } else {
+      tx.store.put(data);
+    }
+    return tx.done;
   }
   // external (remote)  interfaces
   async fetch() {
