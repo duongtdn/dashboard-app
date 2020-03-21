@@ -134,8 +134,9 @@ const db = new LocalDB({ stores: {
   order: 'number'
 }});
 
-dump.forEach(order => {
-  db.order.put(order).then( () => console.log(`put order: ${order.number}`));
+db.order.put(dump).then( () => {
+  console.log(`put orders`);
+  dump.forEach( order => console.log(`   --> ${order.number}`));
 });
 
 export default class AppData extends Component {
@@ -145,13 +146,51 @@ export default class AppData extends Component {
       orders: []
     };
     db.order.all().then( orders => this.setState({ orders }) );
+    this.updateOrder = this.updateOrder.bind(this);
+    this.resetOrder = this.resetOrder.bind(this);
+    this.saveOrder = this.saveOrder.bind(this);
   }
   render() {
     return (
       <App  orders = {this.state.orders}
             db = {db}
+            updateOrder = {this.updateOrder}
+            resetOrder = {this.resetOrder}
+            saveOrder = {this.saveOrder}
             {...this.props}
       />
     );
+  }
+  updateOrder({ number, changes }) {
+    const orders = [...this.state.orders];
+    const order = orders.find(order => order.number === number);
+    if (!order) { return; }
+    if (!order.__changed) { order.__changed = {}; }
+    for (let attr in changes) {
+      order[attr] = changes[attr];
+      order.__changed[attr] = changes[attr];
+    }
+    this.setState({ orders });
+  }
+  async resetOrder({ number }) {
+    const orders = [...this.state.orders];
+    const index = orders.findIndex(order => order.number === number);
+    if (index !== -1) {
+      const order = await db.order.get(number);
+      orders[index] = order;
+      this.setState({ orders });
+    }
+  }
+  saveOrder() {
+    const changes = this.state.orders.filter(order => order.__changed !== undefined);
+    if (changes.length === 0) { return; }
+    const saving = changes.map(order => {
+      order.__updated = true;
+      return order;
+    });
+    db.order.put(saving).then( () => {
+      console.log('Updated changes to local-db');
+      db.order.all().then( orders => this.setState({ orders }) );
+    });
   }
 }

@@ -18,7 +18,11 @@ const Item = (props) => (
 class Row extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      spinIcon: false,
+    };
     this.showPopupOrder = this.showPopupOrder.bind(this);
+    this.resetOrder = this.resetOrder.bind(this);
   }
   render() {
     const order = this.props.order;
@@ -34,16 +38,22 @@ class Row extends Component {
       case 'DELIVERY':
         statusTagColor = 'blue';
         break;
-      case 'DELETED':
+      case 'DELETE':
         statusTagColor = 'grey';
         break;
       default:
         statusTagColor = 'white';
         break;
     };
+    const statusIcon = order.__updated ? <i className="fas fa-exclamation w3-small w3-text-red" /> :
+      order.__changed !== undefined?
+        <i className = {`fas fa-redo-alt w3-small w3-text-gray cursor-pointer ${this.state.spinIcon? 'w3-spin': ''}`} onClick = {this.resetOrder} />
+        : null;
+
     return (
       <tr key={order.number} >
-        <td> <i className="fas fa-exclamation w3-small w3-text-red" /> </td>
+        {/* <td> <i className="fas fa-exclamation w3-small w3-text-red" /> </td> */}
+        <td style={{width: '36px'}}> {statusIcon} </td>
         <td> <a href='' onClick={this.showPopupOrder}> #{order.number.split('-')[0]} </a> </td>
         <td> {order.items.map( item => <Item key={item.code} item = {item} /> )} </td>
         <td> {localeString(subTotal, ',')} </td>
@@ -57,6 +67,14 @@ class Row extends Component {
     e.preventDefault();
     const order = this.props.order;
     this.props.popupOrder && this.props.popupOrder({ order });
+  }
+  resetOrder(e) {
+    e.preventDefault();
+    this.setState({ spinIcon: true });
+    setTimeout( () => {
+      this.setState({ spinIcon: false });
+      this.props.resetOrder && this.props.resetOrder({number: this.props.order.number});
+    }, 500);
   }
 }
 
@@ -212,7 +230,7 @@ class CommandBoard extends Component {
           <label className = "italic w3-text-grey w3-small" style = {{marginRight: '16px'}} >
             Last sync: {getDay(this.props.lastSync, 'short', '-')} {getTime(this.props.lastSync)}
           </label>
-          <button className = "w3-button w3-small outline-none w3-ripple">
+          <button className = "w3-button w3-small outline-none w3-ripple" onClick = {e => this.props.saveOrder && this.props.saveOrder()}>
             <i className = "fas fa-save" /> Save
           </button>
           <button className = "w3-button w3-small outline-none w3-ripple">
@@ -301,7 +319,9 @@ export default class Order extends Component {
   }
   popupOrder({ order }) {
     this.props.page.popup(PopupOrder, { order })
-    .then( action => console.log(action) )
+    .then( action => {
+      action && this.props.updateOrder && this.props.updateOrder({number: order.number, changes: {status: action}});
+    })
     .catch(() => {});
   }
 }
