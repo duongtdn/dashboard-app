@@ -206,6 +206,7 @@ class CommandBoard extends Component {
     this.state = {
       year: props.year,
       month: props.month,
+      isFetching: false,
     };
 
     this.years = [];
@@ -216,6 +217,7 @@ class CommandBoard extends Component {
 
     this.onSelectYear = this.onSelectYear.bind(this);
     this.onSelectMonth = this.onSelectMonth.bind(this);
+    this.fetchOrder = this.fetchOrder.bind(this);
   }
   render() {
     return (
@@ -233,8 +235,8 @@ class CommandBoard extends Component {
           <button className = "w3-button w3-small outline-none w3-ripple" onClick = {e => this.props.saveOrder && this.props.saveOrder()}>
             <i className = "fas fa-save" /> Save
           </button>
-          <button className = "w3-button w3-small outline-none w3-ripple">
-            <i className = "fas fa-sync" /> Fetch
+          <button className = "w3-button w3-small outline-none w3-ripple" onClick = {this.fetchOrder}>
+            <i className = {`fas fa-sync ${this.state.isFetching? 'w3-spin' : ''}`} /> Fetch
           </button>
           {' '}
           <button className = "w3-button w3-small outline-none w3-ripple">
@@ -252,6 +254,21 @@ class CommandBoard extends Component {
     const index = this.months.indexOf(month)
     this.setState({ month: index });
     this.props.onSelectMonth && this.props.onSelectMonth(index);
+  }
+  fetchOrder(e) {
+    e.preventDefault();
+    const now = new Date(this.state.year, this.state.month + 1, 0); // till the last day of current month
+    const thisMonth = now.getMonth();
+    const prevMonth = thisMonth === 0? 11 : thisMonth - 1;
+    const thisYear = now.getFullYear();
+    const year =  thisMonth === 0? thisYear - 1 : thisYear
+    const from = (new Date(year, prevMonth, 1)).getTime();
+    const to = now.getTime();
+    const query = `from=${from}&to=${to}`;
+    this.setState({ isFetching: true })
+    this.props.fetchOrder && this.props.fetchOrder(query)
+    .then( () => this.setState({ isFetching: false }) )
+    .catch( () => this.setState({ isFetching: false }) );
   }
 }
 

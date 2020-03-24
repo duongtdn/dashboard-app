@@ -1,6 +1,7 @@
 "use strict"
 
 import { openDB } from 'idb'
+import xhttp from '@realmjs/xhttp-request'
 
 class Store {
   constructor(name, db, remote) {
@@ -27,8 +28,22 @@ class Store {
     return tx.done;
   }
   // external (remote)  interfaces
-  async fetch() {
-
+  async fetch(query) {
+    return new Promise((resolve, reject) => {
+      xhttp.get(`${this.remote.fetch}?${query}`)
+      .then( async ({status, responseText}) => {
+        if (status === 200) {
+          const data = JSON.parse(responseText);
+          await this.put(data);
+          resolve(data);
+        } else {
+          reject(status);
+        }
+      })
+      .catch( err => {
+        reject(err);
+      });
+    });
   }
   async push() {
 
@@ -36,7 +51,7 @@ class Store {
 }
 
 export default class LocalDB {
-  constructor({name, stores}) {
+  constructor({name, stores, remote}) {
     // validate parameters
     if (Object.keys(stores).indexOf('db') !== -1 || Object.keys(stores).indexOf('stores') !== -1) {
       throw new Error('Store name is reserved!');
@@ -55,7 +70,7 @@ export default class LocalDB {
     // init store handles
     this.stores = {};
     stores && Object.keys(stores).forEach( store => {
-      this.stores[store] = new Store(store, this.db);
+      this.stores[store] = new Store(store, this.db, remote);
       this[store] = this.stores[store];
     });
   }

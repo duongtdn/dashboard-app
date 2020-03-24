@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 
+import env from '../script/env'
 import LocalDB from '../lib/local-db'
 import App from './App'
 
@@ -130,14 +131,19 @@ const dump = [
   }
 ]
 
-const db = new LocalDB({ stores: {
-  order: 'number'
-}});
-
-db.order.put(dump).then( () => {
-  console.log(`put orders`);
-  dump.forEach( order => console.log(`   --> ${order.number}`));
+const db = new LocalDB({
+  stores: {
+    order: 'number',
+  },
+  remote: {
+    fetch: env.remote.order.fetch,
+  },
 });
+
+// db.order.put(dump).then( () => {
+//   console.log(`put orders`);
+//   dump.forEach( order => console.log(`   --> ${order.number}`));
+// });
 
 export default class AppData extends Component {
   constructor(props) {
@@ -149,6 +155,7 @@ export default class AppData extends Component {
     this.updateOrder = this.updateOrder.bind(this);
     this.resetOrder = this.resetOrder.bind(this);
     this.saveOrder = this.saveOrder.bind(this);
+    this.fetchOrder = this.fetchOrder.bind(this);
   }
   render() {
     return (
@@ -157,6 +164,7 @@ export default class AppData extends Component {
             updateOrder = {this.updateOrder}
             resetOrder = {this.resetOrder}
             saveOrder = {this.saveOrder}
+            fetchOrder = {this.fetchOrder}
             {...this.props}
       />
     );
@@ -191,6 +199,17 @@ export default class AppData extends Component {
     db.order.put(saving).then( () => {
       console.log('Updated changes to local-db');
       db.order.all().then( orders => this.setState({ orders }) );
+    });
+  }
+  fetchOrder(query) {
+    return new Promise((resolve, reject) => {
+      db.order.fetch(query)
+      .then(orders => {
+        console.log(orders)
+        this.setState({ orders });
+        resolve();
+      })
+      .catch(err => { console.log(err); reject(err); });
     });
   }
 }

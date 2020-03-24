@@ -22,6 +22,12 @@ module.exports = {
     mode: 'development',
     devtool: 'inline-source-map',
     devServer: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3400',
+          pathRewrite: {'^/api' : ''}
+        }
+      },
       contentBase: path.join(__dirname, 'build'),
       publicPath: "/assets/",
       historyApiFallback: true
