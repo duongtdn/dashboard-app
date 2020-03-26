@@ -6,6 +6,7 @@ const api = Builder();
 
 api.add('/order', {
   get: require('./order/fetch'),
+  put: require('./order/push'),
 });
 
 module.exports = api

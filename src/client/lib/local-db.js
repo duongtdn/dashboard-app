@@ -45,8 +45,20 @@ class Store {
       });
     });
   }
-  async push() {
-
+  async push(data) {
+    return new Promise((resolve, reject) => {
+      xhttp.put(`${this.remote.push}`, data)
+      .then( async ({status, responseText}) => {
+        if (status === 200) {
+          resolve();
+        } else {
+          reject(status);
+        }
+      })
+      .catch( err => {
+        reject(err);
+      });
+    });
   }
 }
 

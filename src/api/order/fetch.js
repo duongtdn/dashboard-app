@@ -27,7 +27,7 @@ function gatherOrders(helpers) {
         action: 'FIND in ORDERIDX',
         error: err
       });
-      res.status(500).json({ reason: 'Failed to Access Database' });
+      res.status(500).json({ error: 'Failed to Access Database' });
     });
   }
 }

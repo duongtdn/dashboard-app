@@ -207,6 +207,7 @@ class CommandBoard extends Component {
       year: props.year,
       month: props.month,
       isFetching: false,
+      isPushing: false,
     };
 
     this.years = [];
@@ -218,6 +219,7 @@ class CommandBoard extends Component {
     this.onSelectYear = this.onSelectYear.bind(this);
     this.onSelectMonth = this.onSelectMonth.bind(this);
     this.fetchOrder = this.fetchOrder.bind(this);
+    this.pushChangedOrders = this.pushChangedOrders.bind(this);
   }
   render() {
     return (
@@ -239,7 +241,7 @@ class CommandBoard extends Component {
             <i className = {`fas fa-sync ${this.state.isFetching? 'w3-spin' : ''}`} /> Fetch
           </button>
           {' '}
-          <button className = "w3-button w3-small outline-none w3-ripple">
+          <button className = "w3-button w3-small outline-none w3-ripple" onClick = {this.pushChangedOrders} disabled = {this.state.isPushing}>
             <i className = "fas fa-upload" /> Push
           </button>
         </div>
@@ -265,10 +267,17 @@ class CommandBoard extends Component {
     const from = (new Date(year, prevMonth, 1)).getTime();
     const to = now.getTime();
     const query = `from=${from}&to=${to}`;
-    this.setState({ isFetching: true })
+    this.setState({ isFetching: true });
     this.props.fetchOrder && this.props.fetchOrder(query)
     .then( () => this.setState({ isFetching: false }) )
     .catch( () => this.setState({ isFetching: false }) );
+  }
+  pushChangedOrders(e) {
+    e.preventDefault();
+    this.setState({ isPushing: true });
+    this.props.pushChangedOrders && this.props.pushChangedOrders()
+    .then( () => this.setState({ isPushing: false }) )
+    .catch( () => this.setState({ isPushing: false }) );
   }
 }
 

@@ -2,7 +2,8 @@
 
 const remote = {
   order: {
-    fetch: 'api/order'
+    fetch: 'api/order',
+    push: 'api/order',
   }
 };
 

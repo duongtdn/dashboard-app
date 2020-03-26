@@ -137,6 +137,7 @@ const db = new LocalDB({
   },
   remote: {
     fetch: env.remote.order.fetch,
+    push: env.remote.order.push,
   },
 });
 
@@ -156,6 +157,7 @@ export default class AppData extends Component {
     this.resetOrder = this.resetOrder.bind(this);
     this.saveOrder = this.saveOrder.bind(this);
     this.fetchOrder = this.fetchOrder.bind(this);
+    this.pushChangedOrders = this.pushChangedOrders.bind(this);
   }
   render() {
     return (
@@ -165,6 +167,7 @@ export default class AppData extends Component {
             resetOrder = {this.resetOrder}
             saveOrder = {this.saveOrder}
             fetchOrder = {this.fetchOrder}
+            pushChangedOrders = {this.pushChangedOrders}
             {...this.props}
       />
     );
@@ -208,6 +211,61 @@ export default class AppData extends Component {
         console.log(orders)
         this.setState({ orders });
         resolve();
+      })
+      .catch(err => { console.log(err); reject(err); });
+    });
+  }
+  pushChangedOrders() {
+    return new Promise((resolve, reject) => {
+      const orders = this.state.orders.filter(order => order.__changed).map(order => {
+        const _order = {
+          uid: order.uid,
+          createdAt: order.createdAt,
+          changes: order.__changed,
+        };
+        if (order.__changed.status && order.__changed.status.toUpperCase() === 'FULFILL') {
+          const courses = [];
+          order.items.forEach( item => {
+            if (item.type === 'course') {
+              courses.push(item.code);
+            } else if (item.type === 'bundle') {
+              item.items.forEach( item => {
+                if (item.type === 'course') {
+                  courses.push(item.code);
+                }
+              });
+            }
+          });
+
+          if (courses.length > 0) {
+            _order.courses = courses;
+            _order.number = order.number;
+          }
+          if (order.activationCode) {
+            _order.activationCode = order.activationCode;
+          }
+        }
+        return _order;
+      });
+      if (orders.length === 0) {
+        resolve();
+        return
+      }
+      db.order.push({ orders })
+      .then( () => {
+        const orders = this.state.orders.map(order => {
+          const _order = {};
+          for(let key in order) {
+            if (key !== '__changed' && key !== '__updated') {
+              _order[key] = order[key];
+            }
+          }
+          return _order;
+        });
+        this.setState({ orders });
+        db.order.put(orders)
+        .then( () => { console.log('Updated local db after push'); resolve(); })
+        .catch( err => { console.log('Failed to updated local db after push'); reject(err) });
       })
       .catch(err => { console.log(err); reject(err); });
     });

@@ -15,15 +15,46 @@ if (process.env.PROXY) {
 }
 const dbh = new DatabaseHelper({ aws, measureExecutionTime: true });
 dbh.addTable('ORDER', {indexes: ['ORDERIDX']});
+dbh.addTable(['ENROLL', 'PROGRESS', 'ACTIVECODE']);
 api.helpers({ Database: dbh.drivers});
 api.helpers({
   alert({message, action, error}) {
-    console.log(`\nALERT: -----------------------------------------------------------`);
-    console.log(`--> by action: ${action}`);
-    console.log(`--> ${message}`);
-    console.log(error);
-    console.log(`------------------------------------------------------------------`);
+    console.log(`\nALERT: -----------------------------------------------------------`)
+    console.log(`--> by action: ${action}`)
+    console.log(`--> ${message}`)
+    console.log(error)
+    console.log(`------------------------------------------------------------------`)
   },
+  notify({template, recipient, data}) {
+    return new Promise( (resolve, reject) => {
+      console.log(`\nNOTIFICATION:  -------------------------------------------------`)
+      console.log(`--> template: ${template}`)
+      console.log(`--> to: ${recipient}`)
+      console.log(`${JSON.stringify(data)}`)
+      console.log(`------------------------------------------------------------------`)
+      resolve()
+    })
+  },
+  invoke: {
+    registerTests({courses, euid}) {
+      return new Promise( (resolve, reject) => {
+        try {
+          const tests = {}
+          courses.forEach(course => {
+            tests[course] = {
+              'exam-01':  {
+                testId: `${course}-t-01`,
+                resultId: `${course}-r-01`
+              }
+            }
+          })
+          resolve(tests)
+        } catch(err) {
+          reject(err)
+        }
+      })
+    }
+  }
 });
 
 const express = require('express');
