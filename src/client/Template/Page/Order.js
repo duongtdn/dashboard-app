@@ -90,7 +90,12 @@ class Table extends Component {
     this.popupFilterPayment = this.popupFilterPayment.bind(this);
   }
   render() {
-    const orders = this.sort([...this.props.orders]).filter(order => {
+    const month = this.props.month;
+    const year = this.props.year;
+    const begin = new Date(year, month, 1); // first day of month
+    const end = new Date(year, month +1, 0, 23, 59, 59);  // last day of month
+    const ordersOfThisMonth = this.props.orders.filter(order => order.createdAt >= begin && order.createdAt <= end);
+    const orders = this.sort(ordersOfThisMonth).filter(order => {
       const filter = this.state.filter;
       if (filter.status && filter.status.indexOf(order.status) === -1) {
         return false;
@@ -259,7 +264,7 @@ class CommandBoard extends Component {
   }
   fetchOrder(e) {
     e.preventDefault();
-    const now = new Date(this.state.year, this.state.month + 1, 0); // till the last day of current month
+    const now = new Date(this.state.year, this.state.month + 1, 0, 23, 59, 59); // till the last day of current month
     const thisMonth = now.getMonth();
     const prevMonth = thisMonth === 0? 11 : thisMonth - 1;
     const thisYear = now.getFullYear();
@@ -317,7 +322,7 @@ export default class Order extends Component {
               <div key={year.year}>
                 <h4 className = "bold" style = {{ marginTop: '16px' }}> {year.year} </h4>
                 {
-                  year.months.map(month => <Table key = {month} month = {month} popupOrder = {this.popupOrder} {...this.props} />)
+                  year.months.map(month => <Table key = {month} month = {month} year = {year.year} popupOrder = {this.popupOrder} {...this.props} />)
                 }
               </div>
             );
