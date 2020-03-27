@@ -3,6 +3,7 @@
 import React, { Component } from 'react'
 
 import { localeString, getDay } from '../../lib/util'
+import Loading from './Loading'
 
 
 export default class PopupOrder extends Component {
@@ -127,12 +128,16 @@ export default class PopupOrder extends Component {
       }
     }
     this.setState({ isPushing: true });
-    this.props.pushChangedOrders && this.props.pushChangedOrders(order)
-    .then(() => {
-      this.setState({ isPushing: false, action: null });
-      this.props.self.resolve(null);
-    })
-    .catch(err => console.log(err));
+    this.props.page.popup(Loading, {overlay: true}, self => {
+      this.props.pushChangedOrders && this.props.pushChangedOrders(order)
+      .then(() => {
+        self.resolve();
+        this.setState({ isPushing: false, action: null });
+        this.props.self.resolve(null);
+      })
+      .catch(err => console.log(err));
+    });
+
   }
   createStatusTagColor(tag) {
     let color = 'w3-grey';
