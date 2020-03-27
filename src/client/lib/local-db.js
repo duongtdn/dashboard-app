@@ -74,7 +74,7 @@ class Store {
 }
 
 export default class LocalDB {
-  constructor({name, stores, remote}) {
+  constructor({name, stores}) {
     // validate parameters
     if (Object.keys(stores).indexOf('db') !== -1 || Object.keys(stores).indexOf('stores') !== -1) {
       throw new Error('Store name is reserved!');
@@ -85,7 +85,7 @@ export default class LocalDB {
         console.log(`Upgrade local DB from version ${oldVersion} to ${newVersion}`);
         stores && Object.keys(stores).forEach( store => {
           if (!db.objectStoreNames.contains(store)) {
-            db.createObjectStore(store, { keyPath: stores[store] });
+            db.createObjectStore(store, { keyPath: stores[store].key });
           }
         });
       }
@@ -93,7 +93,7 @@ export default class LocalDB {
     // init store handles
     this.stores = {};
     stores && Object.keys(stores).forEach( store => {
-      this.stores[store] = new Store(store, this.db, remote);
+      this.stores[store] = new Store(store, this.db, stores[store].remote);
       this[store] = this.stores[store];
     });
   }

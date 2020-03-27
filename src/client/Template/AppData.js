@@ -133,11 +133,13 @@ const dump = [
 
 const db = new LocalDB({
   stores: {
-    order: 'number',
-  },
-  remote: {
-    fetch: env.remote.order.fetch,
-    push: env.remote.order.push,
+    order: {
+      key: 'number',
+      remote: {
+        fetch: env.remote.order.fetch,
+        push: env.remote.order.push,
+      },
+    },
   },
 });
 
