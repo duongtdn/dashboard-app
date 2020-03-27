@@ -210,7 +210,6 @@ export default class AppData extends Component {
     return new Promise((resolve, reject) => {
       db.order.fetch(query)
       .then(orders => {
-        console.log(orders)
         this.setState({ orders });
         this.cleanDeletedOrdersFromIDB();
         resolve();

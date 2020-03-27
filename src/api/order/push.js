@@ -82,7 +82,7 @@ function updateOrder(helpers) {
 
 function processOthers(helpers) {
   return function(req, res, next) {
-    if (!req.ordersToFulfill || req.ordersToFulfill.length === 0) {
+    if (req.ordersToFulfill.length === 0 && req.ordersToDelete.length === 0) {
       next();
       return
     }
