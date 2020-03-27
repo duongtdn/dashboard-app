@@ -211,7 +211,7 @@ export default class AppData extends Component {
       db.order.fetch(query)
       .then(orders => {
         this.setState({ orders });
-        this.cleanDeletedOrdersFromIDB();
+        this.cleanDeletedOrdersFromIDB({fetched: orders});
         resolve();
       })
       .catch(err => { console.log(err); reject(err); });
@@ -280,11 +280,11 @@ export default class AppData extends Component {
       .catch(err => { console.log(err); reject(err); });
     });
   }
-  cleanDeletedOrdersFromIDB() {
+  cleanDeletedOrdersFromIDB({fetched}) {
     // cleanup deleted order
     db.order.all()
     .then(orders => {
-      const keys = orders.filter(order => order.status.toUpperCase() === 'DELETE').map(order => order.number);
+      const keys = orders.filter(order => order.status.toUpperCase() === 'DELETE' || !fetched.find(o => o.number === order.number) ).map(order => order.number);
       db.order.delete(keys)
       .then(() => console.log(`clean deleted orders`))
       .catch(err => console.log(err));
