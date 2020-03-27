@@ -8,14 +8,16 @@ import { localeString, getDay } from '../../lib/util'
 export default class PopupOrder extends Component {
   constructor(props) {
     super(props);
-    this.state = { action : null };
+    this.state = { action : null, isPushing: false };
     this.confirm = this.confirm.bind(this);
     this.cancel = this.cancel.bind(this);
+    this.push = this.push.bind(this);
   }
   render() {
     const order = this.props.self.order;
     const subTotal = order.items.reduce( (acc,cur) => acc + cur.price, 0);
     const statusTagColor = this.createStatusTagColor(order.status);
+    const isDisabledPush = !this.state.action || this.state.isPushing;
     return (
       <div className = "w3-round w3-white w3-card-4 w3-container" style = {{ margin: 'auto', width: '70%', minWidth: '300px' }}>
         <div style = {{marginBottom: '16px'}}>
@@ -35,6 +37,9 @@ export default class PopupOrder extends Component {
         <div className = "w3-bar w3-border-top w3-border-bottom" style = {{display: order.status === 'fulfill'? 'none' : 'block'}}>
           <div className = "w3-bar-item w3-small">
             <label className = 'italic w3-text-grey'> Change order status to: </label>
+            <button className = {`w3-button outline-none ${this.state.action === 'new' ? 'w3-blue' : ''}`} onClick = {e => this.setState({ action: 'new'})}>
+              <i className = "far fa-star" /> New
+            </button>
             <button className = {`w3-button outline-none ${this.state.action === 'delivery' ? 'w3-blue' : ''}`} onClick = {e => this.setState({ action: 'delivery'})}>
               <i className = "fas fa-shuttle-van" /> Delivery
             </button>
@@ -78,6 +83,7 @@ export default class PopupOrder extends Component {
               <button className="w3-button w3-blue" onClick={this.confirm}> Confirm </button>
               {' '}
               <button className="w3-button" onClick={this.cancel}> Cancel </button>
+              <button className="w3-button w3-red w3-right" onClick={this.push} disabled = {isDisabledPush}> <i className = "fas fa-upload" /> Push </button>
             </p>
         }
       </div>
@@ -88,6 +94,45 @@ export default class PopupOrder extends Component {
   }
   cancel() {
     this.props.self.reject();
+  }
+  push() {
+    if (!this.state.action) {
+      return
+    }
+    const order = {
+      uid: this.props.self.order.uid,
+      createdAt: this.props.self.order.createdAt,
+      changes: { status: this.state.action }
+    };
+    if (this.state.action.toUpperCase() === 'FULFILL') {
+      const courses = [];
+      this.props.self.order.items.forEach( item => {
+        if (item.type === 'course') {
+          courses.push(item.code);
+        } else if (item.type === 'bundle') {
+          item.items.forEach( item => {
+            if (item.type === 'course') {
+              courses.push(item.code);
+            }
+          });
+        }
+      });
+
+      if (courses.length > 0) {
+        order.courses = courses;
+        order.number = this.props.self.order.number;
+      }
+      if (this.props.self.order.activationCode) {
+        order.activationCode = this.props.self.order.activationCode;
+      }
+    }
+    this.setState({ isPushing: true });
+    this.props.pushChangedOrders && this.props.pushChangedOrders(order)
+    .then(() => {
+      this.setState({ isPushing: false, action: null });
+      this.props.self.resolve(null);
+    })
+    .catch(err => console.log(err));
   }
   createStatusTagColor(tag) {
     let color = 'w3-grey';

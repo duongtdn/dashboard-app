@@ -215,9 +215,9 @@ export default class AppData extends Component {
       .catch(err => { console.log(err); reject(err); });
     });
   }
-  pushChangedOrders() {
+  pushChangedOrders(order) {
     return new Promise((resolve, reject) => {
-      const orders = this.state.orders.filter(order => order.__changed).map(order => {
+      const orders = order? [order] : this.state.orders.filter(order => order.__changed).map(order => {
         const _order = {
           uid: order.uid,
           createdAt: order.createdAt,
@@ -253,17 +253,25 @@ export default class AppData extends Component {
       }
       db.order.push({ orders })
       .then( () => {
-        const orders = this.state.orders.map(order => {
-          const _order = {};
-          for(let key in order) {
-            if (key !== '__changed' && key !== '__updated') {
-              _order[key] = order[key];
+        const __orders = this.state.orders.map(order => {
+          const changed = orders.find(o => o.createdAt === order.createdAt);
+          if (changed) {
+            const _order = {};
+            for(let key in order) {
+              if (key !== '__changed' && key !== '__updated') {
+                _order[key] = order[key];
+              }
             }
+            for (let key in changed.changes) {
+              _order[key] = changed.changes[key];
+            }
+            return _order;
+          } else {
+            return order;
           }
-          return _order;
         });
-        this.setState({ orders });
-        db.order.put(orders)
+        this.setState({ orders: __orders });
+        db.order.put(__orders)
         .then( () => { console.log('Updated local db after push'); resolve(); })
         .catch( err => { console.log('Failed to updated local db after push'); reject(err) });
       })

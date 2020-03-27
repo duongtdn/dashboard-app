@@ -104,7 +104,7 @@ class Navigator extends Component {
                       const last = this.__popupStack[name].length - 1;
                       return (
                         <div key={index} className="w3-model-content">
-                          { React.createElement(popup.Popup, { self: popup.self }) }
+                          { React.createElement(popup.Popup, { self: popup.self, ...this.props }) }
                         </div>
                       )
                     })
