@@ -27,6 +27,17 @@ class Store {
     }
     return tx.done;
   }
+  async delete(keys) {
+    const tx = (await this.db).transaction(this.name, 'readwrite');
+    if (Array.isArray(keys)) {
+      keys.forEach(key => {
+        tx.store.delete(key);
+      });
+    } else {
+      tx.store.delete(keys);
+    }
+    return tx.done;
+  }
   // external (remote)  interfaces
   async fetch(query) {
     return new Promise((resolve, reject) => {

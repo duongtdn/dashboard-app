@@ -210,6 +210,7 @@ export default class AppData extends Component {
       .then(orders => {
         console.log(orders)
         this.setState({ orders });
+        this.cleanDeletedOrdersFromIDB();
         resolve();
       })
       .catch(err => { console.log(err); reject(err); });
@@ -276,6 +277,16 @@ export default class AppData extends Component {
         .catch( err => { console.log('Failed to updated local db after push'); reject(err) });
       })
       .catch(err => { console.log(err); reject(err); });
+    });
+  }
+  cleanDeletedOrdersFromIDB() {
+    // cleanup deleted order
+    db.order.all()
+    .then(orders => {
+      const keys = orders.filter(order => order.status.toUpperCase() === 'DELETE').map(order => order.number);
+      db.order.delete(keys)
+      .then(() => console.log(`clean deleted orders`))
+      .catch(err => console.log(err));
     });
   }
 }
