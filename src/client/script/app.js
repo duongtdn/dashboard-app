@@ -3,17 +3,11 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import AppData from "../Template/AppData"
+import AccountClient from '@realmjs/account-client'
 
-const env = {
-  assets: {
-    logo: {
-      png_trans: '',
-      png_bg: '',
-      icon: 'assets/icon.png'
-    }
-  }
-}
+import env from './env'
+
+import AppData from "../Template/AppData"
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -24,5 +18,31 @@ if ('serviceWorker' in navigator) {
   })
 }
 
+const acc = new AccountClient({
+  app: env.app,
+  baseurl: env.urlAccount,
+  timeout: 30000
+});
 
-render( <AppData env = {env} />, document.getElementById('root'))
+if (acc) {
+  acc.on('unauthenticated', () => {
+    console.log('unauthenticated');
+  })
+  acc.on('authenticated', () => {
+    console.log('authenticated');
+  })
+}
+
+acc.signinLocally( (status, user) => {
+  if (status === 200) {
+    console.log(`Sing-in locally finished with status code: ${status}`)
+    console.log(user)
+  } else {
+    acc.sso( (status, user) => {
+      console.log(`SSO finished with status code: ${status}`)
+      console.log(user)
+    })
+  }
+})
+
+render( <AppData env = {env} accountClient = {acc} />, document.getElementById('root'))

@@ -2,6 +2,8 @@
 
 import React, { Component } from 'react'
 
+import { UserProvider } from '@realmjs/react-user'
+
 import env from '../script/env'
 import LocalDB from '../lib/local-db'
 import App from './App'
@@ -163,15 +165,17 @@ export default class AppData extends Component {
   }
   render() {
     return (
-      <App  orders = {this.state.orders}
-            db = {db}
-            updateOrder = {this.updateOrder}
-            resetOrder = {this.resetOrder}
-            saveOrder = {this.saveOrder}
-            fetchOrder = {this.fetchOrder}
-            pushChangedOrders = {this.pushChangedOrders}
-            {...this.props}
-      />
+      <UserProvider accountClient = {this.props.accountClient} >
+        <App  orders = {this.state.orders}
+              db = {db}
+              updateOrder = {this.updateOrder}
+              resetOrder = {this.resetOrder}
+              saveOrder = {this.saveOrder}
+              fetchOrder = {this.fetchOrder}
+              pushChangedOrders = {this.pushChangedOrders}
+              {...this.props}
+        />
+      </UserProvider>
     );
   }
   updateOrder({ number, changes }) {
