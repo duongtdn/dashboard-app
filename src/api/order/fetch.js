@@ -1,5 +1,7 @@
 "use strict"
 
+const { authen } = require('../lib/authen');
+
 const MIN = 1;
 const MAX = 5;
 
@@ -38,4 +40,4 @@ function fetch() {
   }
 }
 
-module.exports = [gatherOrders, fetch];
+module.exports = [authen, gatherOrders, fetch];

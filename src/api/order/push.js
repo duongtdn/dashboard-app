@@ -1,5 +1,7 @@
 "use strict"
 
+const { authen } = require('../lib/authen');
+
 /*
   request body:
   orders: [
@@ -224,4 +226,4 @@ function __genDeleteOrder(order) {
   return { orders, activationCodes };
 }
 
-module.exports = [validate, updateOrder, processOthers, final];
+module.exports = [authen, validate, updateOrder, processOthers, final];

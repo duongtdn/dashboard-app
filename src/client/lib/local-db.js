@@ -41,7 +41,7 @@ class Store {
   // external (remote)  interfaces
   async fetch(query) {
     return new Promise((resolve, reject) => {
-      xhttp.get(`${this.remote.fetch}?${query}`)
+      xhttp.get(`${this.remote.fetch}?${query}`, { authen: true })
       .then( async ({status, responseText}) => {
         if (status === 200) {
           const data = JSON.parse(responseText);
@@ -58,7 +58,7 @@ class Store {
   }
   async push(data) {
     return new Promise((resolve, reject) => {
-      xhttp.put(`${this.remote.push}`, data)
+      xhttp.put(`${this.remote.push}`, data, { authen: true })
       .then( async ({status, responseText}) => {
         if (status === 200) {
           resolve();

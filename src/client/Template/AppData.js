@@ -289,6 +289,7 @@ export default class AppData extends Component {
     db.order.all()
     .then(orders => {
       const keys = orders.filter(order => order.status.toUpperCase() === 'DELETE' || !fetched.find(o => o.number === order.number) ).map(order => order.number);
+      if (keys.length === 0) { return }
       db.order.delete(keys)
       .then(() => console.log(`clean deleted orders`))
       .catch(err => console.log(err));
