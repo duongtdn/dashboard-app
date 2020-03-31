@@ -49,7 +49,19 @@ class Row extends Component {
       order.__changed !== undefined?
         <i className = {`fas fa-redo-alt w3-small w3-text-gray cursor-pointer ${this.state.spinIcon? 'w3-spin': ''}`} onClick = {this.resetOrder} />
         : null;
-
+    let paymentIcon = null;
+    switch (order.paymentMethod.toUpperCase()) {
+      case 'COD':
+        paymentIcon =  <i className="fas fa-shuttle-van w3-text-grey" />
+        break;
+      case 'BANK':
+        paymentIcon = <i className="fas fa-landmark w3-text-grey" />
+        break;
+      case 'CARD':
+        paymentIcon = <i className="far fa-credit-card w3-text-grey" />
+        break;
+      default:
+    };
     return (
       <tr key={order.number} >
         {/* <td> <i className="fas fa-exclamation w3-small w3-text-red" /> </td> */}
@@ -58,7 +70,7 @@ class Row extends Component {
         <td> {order.items.map( item => <Item key={item.code} item = {item} /> )} </td>
         <td> {localeString(subTotal, ',')} </td>
         <td> <label className={`w3-tag w3-${statusTagColor}`}>{order.status.toUpperCase()}</label> </td>
-        <td> {order.paymentMethod.toUpperCase()} </td>
+        <td> {paymentIcon} {order.paymentMethod.toUpperCase()} </td>
         <td> {getDay(order.createdAt)} </td>
       </tr>
     )
